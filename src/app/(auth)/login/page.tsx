@@ -3,12 +3,14 @@
 import * as yup from "yup";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
+import { useRouter } from "next/navigation";
 import { yupResolver } from "@hookform/resolvers/yup";
 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { useAuthStore } from "@/store/authStore";
+import { LoginCredentials } from "@/lib/types/payloads";
 
 const schema = yup.object().shape({
   email: yup.string().email().required(),
@@ -16,6 +18,7 @@ const schema = yup.object().shape({
 });
 
 const Login = () => {
+    const router = useRouter();
     const { login, state } = useAuthStore();
 
     const { 
@@ -26,10 +29,13 @@ const Login = () => {
     } = useForm({
         resolver: yupResolver(schema)
     });
-    console.log({state})
+
+    const handleLogin = (data: LoginCredentials) => {
+        login(data, router);
+    };
   
     return (
-        <form onSubmit={handleSubmit(login)} className="flex flex-col gap-6">
+        <form onSubmit={handleSubmit(handleLogin)} className="flex flex-col gap-6">
             <div className="flex flex-col items-center gap-2 text-center">
                 <h1 className="text-2xl font-bold">Login to your account</h1>
                 <p className="text-balance text-sm text-muted-foreground">
@@ -44,12 +50,6 @@ const Login = () => {
                 <div className="grid gap-2">
                     <div className="flex items-center">
                         <Label htmlFor="password">Password</Label>
-                        <a
-                            href="#"
-                            className="ml-auto text-sm underline-offset-4 hover:underline"
-                        >
-                            Forgot your password?
-                        </a>
                     </div>
                     <Input id="password" type="password" {...register('password')} />
                 </div>

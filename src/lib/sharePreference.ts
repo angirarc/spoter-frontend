@@ -55,7 +55,7 @@ export const getUser = (): UserModel | undefined => {
     }
 };
 
-export const destory = () => {
+export const clearAuth = () => {
     try {
         return localStorage.clear();
     } catch (e) {

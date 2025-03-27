@@ -9,15 +9,18 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { useAuthStore } from "@/store/authStore";
+import { useRouter } from "next/navigation";
+import { RegisterCredentials } from "@/lib/types/payloads";
 
 const schema = yup.object().shape({
-    name: yup.string().email().required(),
+    name: yup.string().required(),
     email: yup.string().email().required(),
     password: yup.string().min(8).max(32).required(),
 });
 
 const SignUp = () => {
-    const { signin, state } = useAuthStore();
+    const router = useRouter();
+    const { signup, state } = useAuthStore();
 
     const {
         reset,
@@ -27,10 +30,15 @@ const SignUp = () => {
     } = useForm({
         resolver: yupResolver(schema)
     });
-    console.log({ state })
 
+    const handleSignup = (data: RegisterCredentials) => {
+        signup(data, router);
+    };
+
+    const keys = Object.keys(errors) as (keyof typeof errors)[]; // TODO: fix this casting hell
+    
     return (
-        <form onSubmit={handleSubmit(signin)} className="flex flex-col gap-6">
+        <form onSubmit={handleSubmit(handleSignup)} className="flex flex-col gap-6">
             <div className="flex flex-col items-center gap-2 text-center">
                 <h1 className="text-2xl font-bold">Create your account</h1>
                 <p className="text-balance text-sm text-muted-foreground">
@@ -49,12 +57,6 @@ const SignUp = () => {
                 <div className="grid gap-2">
                     <div className="flex items-center">
                         <Label htmlFor="password">Password</Label>
-                        <a
-                            href="#"
-                            className="ml-auto text-sm underline-offset-4 hover:underline"
-                        >
-                            Forgot your password?
-                        </a>
                     </div>
                     <Input id="password" type="password" {...register('password')} />
                 </div>
@@ -62,9 +64,19 @@ const SignUp = () => {
                     type="submit"
                     className="w-full"
                     disabled={state.login.status === 'ERROR'}>
-                    Login
+                    Create Account
                 </Button>
             </div>
+            {
+                keys.length > 0 &&
+                <ul className="text-sm px-4 py-3 bg-red-300 rounded-md list-disc list-inside">
+                    {
+                        keys.map((key) => (
+                            <li key={key} className="text-black">{errors[key]?.message}</li>
+                        ))
+                    }
+                </ul>
+            }
             <div className="text-center text-sm">
                 Don&apos;t have an account?{" "}
                 <Link href="/signup" className="underline underline-offset-4">

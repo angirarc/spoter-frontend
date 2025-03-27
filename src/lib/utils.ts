@@ -3,6 +3,7 @@ import { clsx, type ClassValue } from "clsx"
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 
 import { LoadingStatus, newStatus } from "./types/state";
+import { clearAuth, getAccessToken } from "./sharePreference";
 
 const API_BASE_URL = (import.meta as any).env?.VITE_API_BASE_URL || 'http://localhost:8000/api';
 
@@ -29,7 +30,7 @@ class HttpClient {
     // Request interceptor for adding auth token
     this.instance.interceptors.request.use(
       (config) => {
-        const token = localStorage.getItem('auth_token');
+        const token = getAccessToken();
         if (token) {
           config.headers['Authorization'] = `Bearer ${token}`;
         }
@@ -49,7 +50,7 @@ class HttpClient {
         // Handle authentication errors
         if (response && response.status === 401) {
           // Clear token and redirect to login if needed
-          localStorage.removeItem('auth_token');
+          clearAuth();
           // For now, we'll just log this as we're assuming the user is authenticated
           console.error('Authentication error: Token expired or invalid');
         }
@@ -90,13 +91,13 @@ export const httpClient = new HttpClient();
 export const handleError = (e: unknown, set: any, status: LoadingStatus, fn: string) => {
   if (axios.isAxiosError(e)) {
     if (e.response) {
-      set({ status: newStatus(status, fn, 'ERROR', e.response.data.message, e) });
+      set({ state: newStatus(status, fn, 'ERROR', e.response.data.message, e) });
     } else if (e.request) {
-      set({ status: newStatus(status, fn, 'ERROR', 'No response received', e) });
+      set({ state: newStatus(status, fn, 'ERROR', 'No response received', e) });
     } else {
-      set({ status: newStatus(status, fn, 'ERROR', 'Unknown error occurred', e) });
+      set({ state: newStatus(status, fn, 'ERROR', 'Unknown error occurred', e) });
     }
   } else {
-    set({ status: newStatus(status, fn, 'ERROR', 'Unknown error occurred', e) });
+    set({ state: newStatus(status, fn, 'ERROR', 'Unknown error occurred', e) });
   }
 };

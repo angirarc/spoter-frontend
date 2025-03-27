@@ -1,4 +1,7 @@
+'use client';
+
 import { create } from 'zustand';
+import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
 
 import { UserModel } from '@/lib/types/models';
 import { initialState, LoadingStatus, newStatus } from '@/lib/types/state';
@@ -6,77 +9,92 @@ import { LoginCredentials, RegisterCredentials } from '@/lib/types/payloads';
 
 import { handleError } from '@/lib/utils';
 import { authService } from '@/lib/services/authService';
-import { setAuth, getLocalStorageItem} from '@/lib/sharePreference';
+import { setAuth, getLocalStorageItem, clearAuth, KEYS} from '@/lib/sharePreference';
 
 interface AuthState {
     state: LoadingStatus;
-    isAuthenticated: boolean;
+    token: string | null;
     user: UserModel | null;
-    loading: boolean;
-    login: (payload: LoginCredentials) => Promise<void>;
-    signin: (payload: RegisterCredentials) => Promise<void>;
-    logout: () => void;
+    isAuthenticated: boolean;
+    logout: (router: AppRouterInstance) => void;
+    me: (router: AppRouterInstance) => Promise<void>;
+    login: (payload: LoginCredentials, router: AppRouterInstance) => Promise<void>;
+    signup: (payload: RegisterCredentials, router: AppRouterInstance) => Promise<void>;
 }
 
 const initialStatus = {
     login: initialState,
-    signin: initialState
+    signup: initialState,
+    me: initialState,
 }
 
 export const useAuthStore = create<AuthState>((set, get) => ({
-    isAuthenticated: false,
-    user: null,
     state: initialStatus,
+    isAuthenticated: false,
+    user: getLocalStorageItem(KEYS.user),
+    token: getLocalStorageItem(KEYS.accessToken),
 
-    login: async (payload) => {
+    login: async (payload, router) => {
         const { state } = get();
         try {
             set({ state: newStatus(state, 'login', 'LOADING') });
             const resp = await authService.login(payload);
             if (resp) {
                 setAuth(resp);
-                set({ isAuthenticated: true, user: resp.user });
+                set({ 
+                    isAuthenticated: true, 
+                    user: resp.user, 
+                    state: newStatus(state, 'login', 'SUCCESS') 
+                });
+                router.push('/');
             }
         } catch (error) {
             handleError(error, set, state, 'login');
         }
     },
 
-    signin: async (payload) => {
-        const { state } = get();
+    me: async (router) => {
+        const { state, logout } = get();
         try {
-            set({ state: newStatus(state, 'signin', 'LOADING') });
-            const resp = await authService.signin(payload);
+            set({ state: newStatus(state, 'me', 'LOADING') });
+            const resp = await authService.me();
+            
             if (resp) {
-                setAuth(resp);
-                set({ isAuthenticated: true, user: resp.user });
+                set({ 
+                    isAuthenticated: true, 
+                    user: resp, 
+                    state: newStatus(state, 'me', 'SUCCESS') 
+                });
+                router.push('/');
             }
         } catch (error) {
-            handleError(error, set, state, 'signin');
+            logout(router);
+            handleError(error, set, state, 'me');
         }
     },
 
-    logout: () => {
-        localStorage.removeItem('auth_token');
-        localStorage.removeItem('auth_user');
-        set({ isAuthenticated: false, user: null });
-    },
-
-    // Initialize auth state from localStorage
-    ...(() => {
-        const token = getLocalStorageItem('auth_token');
-        const storedUser = getLocalStorageItem('auth_user');
-
-        if (token && storedUser) {
-            try {
-                const user = JSON.parse(storedUser);
-                return { isAuthenticated: true, user, loading: false };
-            } catch (error) {
-                console.error('Failed to parse stored user:', error);
-                localStorage.removeItem('auth_token');
-                localStorage.removeItem('auth_user');
+    signup: async (payload, router) => {
+        const { state } = get();
+        try {
+            set({ state: newStatus(state, 'signup', 'LOADING') });
+            const resp = await authService.signup(payload);
+            if (resp) {
+                setAuth(resp);
+                set({ 
+                    isAuthenticated: true, 
+                    user: resp.user, 
+                    state: newStatus(state, 'signup', 'SUCCESS') 
+                });
+                router.push('/');
             }
+        } catch (error) {
+            handleError(error, set, state, 'signup');
         }
-        return { loading: false };
-    })()
+    },
+
+    logout: (router) => {
+        clearAuth();
+        set({ isAuthenticated: false, user: null });
+        router.push('/login');
+    },
 }));
