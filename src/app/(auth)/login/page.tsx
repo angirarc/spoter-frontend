@@ -1,11 +1,35 @@
-import { Button } from "@/components/ui/button";
+'use client';
+
+import * as yup from "yup";
+import Link from "next/link";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { useAuthStore } from "@/store/authStore";
+
+const schema = yup.object().shape({
+  email: yup.string().email().required(),
+  password: yup.string().min(8).max(32).required(),
+});
 
 const Login = () => {
+    const { login, state } = useAuthStore();
+
+    const { 
+        reset,
+        register, 
+        handleSubmit, 
+        formState: { errors } 
+    } = useForm({
+        resolver: yupResolver(schema)
+    });
+    console.log({state})
+  
     return (
-        <form className="flex flex-col gap-6">
+        <form onSubmit={handleSubmit(login)} className="flex flex-col gap-6">
             <div className="flex flex-col items-center gap-2 text-center">
                 <h1 className="text-2xl font-bold">Login to your account</h1>
                 <p className="text-balance text-sm text-muted-foreground">
@@ -15,7 +39,7 @@ const Login = () => {
             <div className="grid gap-6">
                 <div className="grid gap-2">
                     <Label htmlFor="email">Email</Label>
-                    <Input id="email" type="email" placeholder="m@example.com" required />
+                    <Input id="email" type="email" placeholder="m@example.com" {...register('email')} />
                 </div>
                 <div className="grid gap-2">
                     <div className="flex items-center">
@@ -27,9 +51,12 @@ const Login = () => {
                             Forgot your password?
                         </a>
                     </div>
-                    <Input id="password" type="password" required />
+                    <Input id="password" type="password" {...register('password')} />
                 </div>
-                <Button type="submit" className="w-full">
+                <Button 
+                    type="submit" 
+                    className="w-full"
+                    disabled={state.login.status === 'ERROR'}>
                     Login
                 </Button>
             </div>

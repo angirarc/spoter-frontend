@@ -1,33 +1,39 @@
 'use client';
 
+import { AuthResponse } from "./types/auth";
 import { UserModel } from "./types/models";
 
-export interface AuthResponse {
-    accessToken: string;
-    refreshToken: string;
-    expiresAt: {
-        dateTime: string;
-        unix: number;
-    };
-}
-
 // access token
-enum KEYS {
+export enum KEYS {
     accessToken = 'accessToken',
     user = 'user',
 }
 
-export const setLocalStorageItem = (key: string, value: string | number) => {
-    localStorage.setItem(key, value.toString());
+export const setLocalStorageItem = (key: KEYS, value: string | number) => {
+    if (typeof window !== 'undefined') {
+        localStorage.setItem(key, value.toString());
+    }
 };
 
-export const getLocalStorageItem: any = (key: string) => {
-    return localStorage.getItem(key);
+export const getLocalStorageItem: any = (key: KEYS) => {
+    if (typeof window !== 'undefined') {
+        return localStorage.getItem(key);
+    }
+    return null;
+};
+
+export const setAuth = (resp: AuthResponse) => {
+    try {
+        setLocalStorageItem(KEYS.accessToken, resp.token);
+        setLocalStorageItem(KEYS.user, JSON.stringify(resp.user));
+    } catch (e) {
+        console.error(e);
+    }
 };
 
 export const getAccessToken = (): string | undefined => {
     try {
-        const token = localStorage.getItem(KEYS.accessToken);
+        const token = getLocalStorageItem(KEYS.accessToken);
 
         if (!token) return undefined;
 
@@ -37,18 +43,9 @@ export const getAccessToken = (): string | undefined => {
     }
 };
 
-// user
-export const setUser = (user: UserModel) => {
-    try {
-        localStorage.setItem(KEYS.user, JSON.stringify(user));
-    } catch (e) {
-        console.error(e);
-    }
-};
-
 export const getUser = (): UserModel | undefined => {
     try {
-        const user = localStorage.getItem(KEYS.user);
+        const user = getLocalStorageItem(KEYS.user);
         if (user) {
             return JSON.parse(user);
         }
