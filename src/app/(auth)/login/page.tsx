@@ -11,21 +11,22 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { useAuthStore } from "@/store/authStore";
 import { LoginCredentials } from "@/lib/types/payloads";
+import AlertNotif from "@/components/alert-notif";
 
 const schema = yup.object().shape({
-  email: yup.string().email().required(),
-  password: yup.string().min(8).max(32).required(),
+    email: yup.string().email().required(),
+    password: yup.string().min(8).max(32).required(),
 });
 
 const Login = () => {
     const router = useRouter();
     const { login, state } = useAuthStore();
 
-    const { 
+    const {
         reset,
-        register, 
-        handleSubmit, 
-        formState: { errors } 
+        register,
+        handleSubmit,
+        formState: { errors }
     } = useForm({
         resolver: yupResolver(schema)
     });
@@ -33,7 +34,7 @@ const Login = () => {
     const handleLogin = (data: LoginCredentials) => {
         login(data, router);
     };
-  
+
     return (
         <form onSubmit={handleSubmit(handleLogin)} className="flex flex-col gap-6">
             <div className="flex flex-col items-center gap-2 text-center">
@@ -43,6 +44,18 @@ const Login = () => {
                 </p>
             </div>
             <div className="grid gap-6">
+                {state.login.status === 'ERROR' &&
+                    <AlertNotif
+                        type="destructive"
+                        title="Error Logging In"
+                        message={state.login.message ?? ''} />
+                }
+                {state.login.status === 'SUCCESS' &&
+                    <AlertNotif
+                        type="default"
+                        title="Login Successful"
+                        message="You will be redirected to the homepage" />
+                }
                 <div className="grid gap-2">
                     <Label htmlFor="email">Email</Label>
                     <Input id="email" type="email" placeholder="m@example.com" {...register('email')} />
@@ -53,10 +66,10 @@ const Login = () => {
                     </div>
                     <Input id="password" type="password" {...register('password')} />
                 </div>
-                <Button 
-                    type="submit" 
+                <Button
+                    type="submit"
                     className="w-full"
-                    disabled={state.login.status === 'ERROR'}>
+                    disabled={state.login.status === 'LOADING'}>
                     Login
                 </Button>
             </div>

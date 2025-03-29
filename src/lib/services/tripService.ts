@@ -4,8 +4,12 @@ import { TripPayload, LogPayload } from '@/lib/types/payloads';
 
 class TripService {
   async getTrips(): Promise<TripModel[]> {
-    const response = await httpClient.get<TripModel[]>('/trips/');
-    return response.data;
+    try {
+      const response = await httpClient.get<TripModel[]>('/trips/');
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
   }
 
   async createTrip(payload: TripPayload): Promise<TripModel> {

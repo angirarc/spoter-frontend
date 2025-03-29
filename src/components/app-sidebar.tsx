@@ -3,23 +3,11 @@
 import * as React from "react"
 import {
     ArrowUpCircleIcon,
-    BarChartIcon,
-    CameraIcon,
     ClipboardListIcon,
-    DatabaseIcon,
     DeleteIcon,
     EyeIcon,
-    FileCodeIcon,
-    FileIcon,
-    FileTextIcon,
-    FolderIcon,
-    HelpCircleIcon,
-    LayoutDashboardIcon,
-    ListIcon,
     MoreHorizontalIcon,
     PlusCircleIcon,
-    SearchIcon,
-    SettingsIcon,
     UsersIcon,
 } from "lucide-react"
 
@@ -44,132 +32,30 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import NavUser from "@/components/nav-user";
-import { NavMain } from "@/components/nav-main";
 import { useTripStore } from "@/store/tripStore";
 import { ClipLoader } from "react-spinners"
+import { TripModel } from "@/lib/types/models"
+import ConfirmDialog from "./confirm-dialog"
+import useToggle from "@/hooks/use-toggle"
 
-const data = {
-    user: {
-        name: "shadcn",
-        email: "m@example.com",
-        avatar: "/avatars/shadcn.jpg",
-    },
-    navMain: [
-        {
-            title: "Dashboard",
-            url: "#",
-            icon: LayoutDashboardIcon,
-        },
-        {
-            title: "Lifecycle",
-            url: "#",
-            icon: ListIcon,
-        },
-        {
-            title: "Analytics",
-            url: "#",
-            icon: BarChartIcon,
-        },
-        {
-            title: "Projects",
-            url: "#",
-            icon: FolderIcon,
-        },
-        {
-            title: "Team",
-            url: "#",
-            icon: UsersIcon,
-        },
-    ],
-    navClouds: [
-        {
-            title: "Capture",
-            icon: CameraIcon,
-            isActive: true,
-            url: "#",
-            items: [
-                {
-                    title: "Active Proposals",
-                    url: "#",
-                },
-                {
-                    title: "Archived",
-                    url: "#",
-                },
-            ],
-        },
-        {
-            title: "Proposal",
-            icon: FileTextIcon,
-            url: "#",
-            items: [
-                {
-                    title: "Active Proposals",
-                    url: "#",
-                },
-                {
-                    title: "Archived",
-                    url: "#",
-                },
-            ],
-        },
-        {
-            title: "Prompts",
-            icon: FileCodeIcon,
-            url: "#",
-            items: [
-                {
-                    title: "Active Proposals",
-                    url: "#",
-                },
-                {
-                    title: "Archived",
-                    url: "#",
-                },
-            ],
-        },
-    ],
-    navSecondary: [
-        {
-            title: "Settings",
-            url: "#",
-            icon: SettingsIcon,
-        },
-        {
-            title: "Get Help",
-            url: "#",
-            icon: HelpCircleIcon,
-        },
-        {
-            title: "Search",
-            url: "#",
-            icon: SearchIcon,
-        },
-    ],
-    documents: [
-        {
-            name: "Data Library",
-            url: "#",
-            icon: DatabaseIcon,
-        },
-        {
-            name: "Reports",
-            url: "#",
-            icon: ClipboardListIcon,
-        },
-        {
-            name: "Word Assistant",
-            url: "#",
-            icon: FileIcon,
-        },
-    ],
-}
+
 
 const AppSidebar = ({ ...props }: React.ComponentProps<typeof Sidebar>) => {
     const { isMobile } = useSidebar();
-    const { trips, getTrips, state } = useTripStore();
+    const { trips, getTrips, state, selectTrip, selectedTrip, deleteTrip } = useTripStore();
+    const [deleteModal, toggleDeleteModal] = useToggle();
 
     const isLoading = state.getTrips.status === "LOADING";
+
+    // Trigger modal
+    const selectForDelete = (trip: TripModel) => {
+        selectTrip(trip);
+        toggleDeleteModal();
+    }
+
+    const performDelete = () => {
+        if (selectedTrip?.id) deleteTrip(selectedTrip.id)
+    }
 
     React.useEffect(() => {
         getTrips();
@@ -183,14 +69,14 @@ const AppSidebar = ({ ...props }: React.ComponentProps<typeof Sidebar>) => {
                     trips.length > 0 ?
                         trips.map((trip) => (
                             <SidebarMenuItem key={trip.id}>
-                                <SidebarMenuButton asChild>
-                                    {/* <a href={item.url}> */}
-                                    <>
-                                        <ClipboardListIcon />
-                                        <span>{trip.pickup_location} - {trip.dropoff_location}</span>
-                                    </>
-                                    {/* </a> */}
-                                </SidebarMenuButton>
+                                <SidebarMenuItem>
+                                    <SidebarMenuButton className={selectedTrip?.id === trip?.id ? 'bg-gray-200' : ''} tooltip="Trip">
+                                        <>
+                                            <ClipboardListIcon color={ trip?.end_time ? 'green' : trip?.start_time ? 'blue' : 'orange'} />
+                                            <span>{trip.pickup_name} - {trip.dropoff_name}</span>
+                                        </>
+                                    </SidebarMenuButton>
+                                </SidebarMenuItem>
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
                                         <SidebarMenuAction
@@ -206,13 +92,13 @@ const AppSidebar = ({ ...props }: React.ComponentProps<typeof Sidebar>) => {
                                         side={isMobile ? "bottom" : "right"}
                                         align={isMobile ? "end" : "start"}
                                     >
-                                        <DropdownMenuItem>
+                                        <DropdownMenuItem onClick={() => selectTrip(trip)}>
                                             <EyeIcon />
                                             <span>View Trip</span>
                                         </DropdownMenuItem>
                                         {
                                             trip.end_time === null && (
-                                                <DropdownMenuItem>
+                                                <DropdownMenuItem onClick={() => selectForDelete(trip)}>
                                                     <DeleteIcon />
                                                     <span>Delete Trip</span>
                                                 </DropdownMenuItem>
@@ -230,6 +116,12 @@ const AppSidebar = ({ ...props }: React.ComponentProps<typeof Sidebar>) => {
                             </SidebarMenuItem>
                         )
                 }
+                <ConfirmDialog
+                    open={deleteModal}
+                    toggle={toggleDeleteModal}
+                    onConfirm={performDelete}
+                    title="Are you sure you want to delete this trip?"
+                    description="This action cannot be undone. This will permanently delete the trip from your account." />
                 {/* <SidebarMenuItem>
                     <SidebarMenuButton className="text-sidebar-foreground/70">
                         <MoreHorizontalIcon className="text-sidebar-foreground/70" />
@@ -246,6 +138,7 @@ const AppSidebar = ({ ...props }: React.ComponentProps<typeof Sidebar>) => {
                 <SidebarMenu>
                     <SidebarMenuItem className="flex items-center gap-2">
                         <SidebarMenuButton
+                            onClick={() => selectTrip()}
                             tooltip="Create New Trip"
                             className="min-w-8 bg-primary text-primary-foreground duration-200 ease-linear hover:bg-primary/90 hover:text-primary-foreground active:bg-primary/90 active:text-primary-foreground"
                         >

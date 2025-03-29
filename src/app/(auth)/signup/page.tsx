@@ -3,14 +3,16 @@
 import * as yup from "yup";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
+import { useRouter } from "next/navigation";
 import { yupResolver } from "@hookform/resolvers/yup";
+
+import { RegisterCredentials } from "@/lib/types/payloads";
 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { useAuthStore } from "@/store/authStore";
-import { useRouter } from "next/navigation";
-import { RegisterCredentials } from "@/lib/types/payloads";
+import AlertNotif from "@/components/alert-notif";
 
 const schema = yup.object().shape({
     name: yup.string().required(),
@@ -46,6 +48,18 @@ const SignUp = () => {
                 </p>
             </div>
             <div className="grid gap-6">
+                {state.login.status === 'ERROR' &&
+                    <AlertNotif
+                        type="destructive"
+                        title="Error Signing Up"
+                        message={state.login.message ?? ''} />
+                }
+                {state.login.status === 'SUCCESS' &&
+                    <AlertNotif
+                        type="default"
+                        title="Login Successful"
+                        message="You will be redirected to the homepage" />
+                }
                 <div className="grid gap-2">
                     <Label htmlFor="name">Name</Label>
                     <Input id="name" type="text" placeholder="John Doe" {...register('name')} />
