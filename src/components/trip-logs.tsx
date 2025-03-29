@@ -5,7 +5,6 @@ import { format } from 'date-fns';
 import { ClockIcon, MapPinIcon, MessageSquareIcon } from 'lucide-react';
 
 import { useTripStore } from '@/store/tripStore';
-import { LogModel } from '@/lib/types/models';
 
 interface TripLogsProps {
     tripId: number;

@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 'use client';
 
 import { AuthResponse } from "./types/auth";
@@ -15,7 +16,7 @@ export const setLocalStorageItem = (key: KEYS, value: string | number) => {
     }
 };
 
-export const getLocalStorageItem: any = (key: KEYS) => {
+export const getLocalStorageItem = (key: KEYS) => {
     if (typeof window !== 'undefined') {
         return localStorage.getItem(key);
     }
@@ -51,7 +52,7 @@ export const getUser = (): UserModel | undefined => {
         }
         return undefined;
     } catch (e) {
-        console.log();
+        console.log(e);
     }
 };
 
@@ -59,6 +60,6 @@ export const clearAuth = () => {
     try {
         return localStorage.clear();
     } catch (e) {
-        console.log();
+        console.log(e);
     }
 };

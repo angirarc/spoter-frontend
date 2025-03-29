@@ -1,14 +1,14 @@
 'use client';
 
+import axios from 'axios';
 import { create } from 'zustand';
 
 import { LogPayload, TripPayload } from '@/lib/types/payloads';
+import { buildInitialState, LoadingStatus, newStatus } from '@/lib/types/state';
 import { TripModel, LogModel, MapBoxFeature, MapBoxResponse, MapboxDirectionsResponse } from '@/lib/types/models';
-import { initialState, LoadingStatus, newStatus } from '@/lib/types/state';
 
 import { handleError } from '@/lib/utils';
 import { tripService } from '@/lib/services/tripService';
-import axios from 'axios';
 
 interface TripState {
     state: LoadingStatus;
@@ -37,14 +37,12 @@ interface TripState {
     deleteTrip: (id: number) => Promise<void>;
 }
 
-let initialStatus: LoadingStatus = {}
-let functions = ['getTrips', 'createTrip', 'searchLocations', 'reverseGeocoding', 'getSingleTrip', 'updateTrip', 'getTripLogs', 'createTripLog', 'updateTripLog', 'deleteTripLog', 'endTrip', 'deleteTrip']
-functions.forEach((func) => initialStatus[func] = initialState);
+const functions = ['getTrips', 'createTrip', 'searchLocations', 'reverseGeocoding', 'getSingleTrip', 'updateTrip', 'getTripLogs', 'createTripLog', 'updateTripLog', 'deleteTripLog', 'endTrip', 'deleteTrip']
 
 const mapBoxApi = process.env.NEXT_PUBLIC_MAPBOX_API_KEY || '';
 
 export const useTripStore = create<TripState>((set, get) => ({
-    state: initialStatus,
+    state: buildInitialState(functions),
     trips: [],
     instructions: [],
     selectedTrip: undefined,
@@ -69,10 +67,10 @@ export const useTripStore = create<TripState>((set, get) => ({
         if (state?.reverseGeocoding?.status === 'LOADING') return;
         try {
             set({ state: newStatus(state, 'reverseGeocoding', 'LOADING') });
-            console.log({state})
+            
             const resp = await axios.get<MapBoxResponse>(`https://api.mapbox.com/search/geocode/v6/reverse?longitude=${long}&latitude=${lat}&access_token=${mapBoxApi}`);
-            console.log({resp})
-            let patch: any = { searchResults: resp.data.features, state: newStatus(state, 'reverseGeocoding', 'SUCCESS') };
+            
+            const patch: any = { searchResults: resp.data.features, state: newStatus(state, 'reverseGeocoding', 'SUCCESS') };
             if (resp.data.features?.length > 0) {
                 patch['userLocation'] = resp.data.features[0];
                 if (callback) callback(resp.data.features[0])
@@ -90,7 +88,7 @@ export const useTripStore = create<TripState>((set, get) => ({
             const long = longitude.join(',');
             set({ state: newStatus(state, 'getTripInstructions', 'LOADING') });
             const resp = await axios.get<MapboxDirectionsResponse>(`https://api.mapbox.com/directions/v5/mapbox/driving/${lat};${long}?access_token=${mapBoxApi}`);
-            let instructions: string[] = [];
+            const instructions: string[] = [];
             resp.data.routes.forEach((route) => 
                 route.legs.forEach((leg) => 
                     leg.notifications.forEach((notif) => 

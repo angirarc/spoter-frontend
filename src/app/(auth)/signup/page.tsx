@@ -25,7 +25,7 @@ const SignUp = () => {
     const { signup, state } = useAuthStore();
 
     const {
-        reset,
+        // reset,
         register,
         handleSubmit,
         formState: { errors }
@@ -37,7 +37,7 @@ const SignUp = () => {
         signup(data, router);
     };
 
-    const keys = Object.keys(errors) as (keyof typeof errors)[]; // TODO: fix this casting hell
+    const keys = Object.keys(errors) as (keyof typeof errors)[];
     
     return (
         <form onSubmit={handleSubmit(handleSignup)} className="flex flex-col gap-6">

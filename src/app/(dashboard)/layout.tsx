@@ -16,7 +16,6 @@ const AppLayout = ({ children }: { children: React.ReactNode }) => {
     setIsClient(true);
   }, []);
 
-  // Only show loading state on client-side to prevent hydration mismatch
   if (!isClient) {
     return <>{children}</>;
   }

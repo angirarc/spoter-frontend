@@ -87,7 +87,7 @@ export interface MapboxDirectionsRoute {
         }[];
         weight: number;
         duration: number;
-        steps: any[];
+        steps: string[];
         distance: number;
         summary: string;
     }[]

@@ -14,7 +14,7 @@ const AuthWrapper = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     setIsClient(true);
     me(router);
-  }, []);
+  }, [me, router]);
 
   // Only show loading state on client-side to prevent hydration mismatch
   if (!isClient) {

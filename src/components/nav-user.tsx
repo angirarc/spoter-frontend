@@ -1,11 +1,8 @@
 "use client"
 
 import {
-    BellIcon,
-    CreditCardIcon,
     LogOutIcon,
     MoreVerticalIcon,
-    UserCircleIcon,
 } from "lucide-react"
 import { useRouter } from "next/navigation"
 
@@ -16,10 +13,8 @@ import {
 import {
     DropdownMenu,
     DropdownMenuContent,
-    DropdownMenuGroup,
     DropdownMenuItem,
     DropdownMenuLabel,
-    DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import {

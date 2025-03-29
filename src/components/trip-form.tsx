@@ -63,7 +63,7 @@ const LocationSelect = ({ value, setValue }: { value?: MapBoxFeature, setValue: 
                                 <CommandItem
                                     key={res.id}
                                     value={res.id}
-                                    onSelect={(currentValue) => {
+                                    onSelect={() => {
                                         setValue(res)
                                         setOpen(false)
                                     }}

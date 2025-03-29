@@ -59,7 +59,7 @@ const AppSidebar = ({ ...props }: React.ComponentProps<typeof Sidebar>) => {
 
     React.useEffect(() => {
         getTrips();
-    }, []);
+    }, [getTrips]);
 
     const previousTrips = () => (
         <SidebarGroup className="group-data-[collapsible=icon]:hidden">

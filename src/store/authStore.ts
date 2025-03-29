@@ -31,7 +31,7 @@ const initialStatus = {
 export const useAuthStore = create<AuthState>((set, get) => ({
     state: initialStatus,
     isAuthenticated: false,
-    user: getLocalStorageItem(KEYS.user),
+    user: JSON.parse(getLocalStorageItem(KEYS.user) ?? ''),
     token: getLocalStorageItem(KEYS.accessToken),
 
     login: async (payload, router) => {

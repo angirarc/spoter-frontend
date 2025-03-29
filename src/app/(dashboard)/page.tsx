@@ -12,7 +12,7 @@ import {
 
 import TripLogs from "@/components/trip-logs";
 import TripDetails from "@/components/trip-details";
-import CreateTripForm from "@/components/trip-form";
+import TripForm from "@/components/trip-form";
 
 const Home = () => {
     const { selectedTrip, createTrip } = useTripStore();
@@ -27,8 +27,7 @@ const Home = () => {
                             <AccordionContent>
                                 {
                                     selectedTrip ? <TripDetails trip={selectedTrip} />
-                                    : <CreateTripForm 
-                                        submit={createTrip} />
+                                    : <TripForm submit={createTrip} />
                                 }
                             </AccordionContent>
                         </AccordionItem>

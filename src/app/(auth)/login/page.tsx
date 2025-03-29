@@ -23,7 +23,6 @@ const Login = () => {
     const { login, state } = useAuthStore();
 
     const {
-        reset,
         register,
         handleSubmit,
         formState: { errors }
@@ -34,6 +33,8 @@ const Login = () => {
     const handleLogin = (data: LoginCredentials) => {
         login(data, router);
     };
+
+    const keys = Object.keys(errors) as (keyof typeof errors)[]; // TODO: fix this casting hell
 
     return (
         <form onSubmit={handleSubmit(handleLogin)} className="flex flex-col gap-6">
@@ -72,6 +73,16 @@ const Login = () => {
                     disabled={state.login.status === 'LOADING'}>
                     Login
                 </Button>
+                {
+                    keys.length > 0 &&
+                    <ul className="text-sm px-4 py-3 bg-red-300 rounded-md list-disc list-inside">
+                        {
+                            keys.map((key) => (
+                                <li key={key} className="text-black">{errors[key]?.message}</li>
+                            ))
+                        }
+                    </ul>
+                }
             </div>
             <div className="text-center text-sm">
                 Don&apos;t have an account?{" "}

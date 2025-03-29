@@ -2,7 +2,7 @@ export type Status = 'INITIAL' | 'LOADING' | 'SUCCESS' | 'ERROR';
 
 export interface State {
     status: Status;
-    error?: any;
+    error?: string | unknown;
     message?: string;
 }
 
@@ -38,3 +38,6 @@ export const newStatus: NewStatusFunction = (
         error,
     },
 });
+
+export const buildInitialState = (functions: string[]): LoadingStatus =>
+    functions.reduce((acc, fn) => ({ ...acc, [fn]: initialState }), {});

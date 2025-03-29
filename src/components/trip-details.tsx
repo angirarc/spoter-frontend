@@ -55,7 +55,7 @@ const TripDetails = ({ trip }: TripDetailsProps) => {
         setCurrentLocation(`${pos.coords.latitude}, ${pos.coords.longitude}`);
       });
     }
-  }, [isLogDialogOpen]);
+  }, [isLogDialogOpen, reverseGeocoding]);
 
   const current = userLocation?.properties.full_address ?? currentLocation;
 

@@ -5,7 +5,7 @@ import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { LoadingStatus, newStatus } from "./types/state";
 import { clearAuth, getAccessToken } from "./sharePreference";
 
-const API_BASE_URL = (import.meta as any).env?.VITE_API_BASE_URL || 'http://localhost:8000/api';
+const API_BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:8000/api';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
