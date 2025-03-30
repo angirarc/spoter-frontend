@@ -9,12 +9,12 @@ import { useAuthStore } from "@/store/authStore";
 const AuthWrapper = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter();
   const [isClient, setIsClient] = useState(false);
-  const { me, state } = useAuthStore();
+  const { me, state, isAuthenticated } = useAuthStore();
 
   useEffect(() => {
     setIsClient(true);
     me(router);
-  }, [me, router]);
+  }, [me, router, isAuthenticated]);
 
   // Only show loading state on client-side to prevent hydration mismatch
   if (!isClient) {

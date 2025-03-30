@@ -5,7 +5,7 @@ import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { LoadingStatus, newStatus } from "./types/state";
 import { clearAuth, getAccessToken } from "./sharePreference";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:8000/api';
+const API_BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:8000';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -16,7 +16,7 @@ class HttpClient {
 
   constructor() {
     this.instance = axios.create({
-      baseURL: API_BASE_URL,
+      baseURL: `${API_BASE_URL}/api`,
       timeout: 30000,
       headers: {
         'Content-Type': 'application/json',
@@ -88,16 +88,21 @@ class HttpClient {
 
 export const httpClient = new HttpClient();
 
-export const handleError = (e: unknown, set: any, status: LoadingStatus, fn: string) => {
+const getErrorMessage = (e: unknown): string => {
   if (axios.isAxiosError(e)) {
     if (e.response) {
-      set({ state: newStatus(status, fn, 'ERROR', e.response.data.message, e) });
+     return e.response.data.error;
     } else if (e.request) {
-      set({ state: newStatus(status, fn, 'ERROR', 'No response received', e) });
+      return 'No response received';
     } else {
-      set({ state: newStatus(status, fn, 'ERROR', 'Unknown error occurred', e) });
+      return 'Unknown error occurred';
     }
   } else {
-    set({ state: newStatus(status, fn, 'ERROR', 'Unknown error occurred', e) });
+    return 'Unknown error occurred';
   }
+}
+
+export const handleError = (e: unknown, set: any, status: LoadingStatus, fn: string) => {
+  const message = getErrorMessage(e);
+  set({ state: newStatus(status, fn, 'ERROR', message, e) });
 };

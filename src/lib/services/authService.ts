@@ -12,8 +12,8 @@ class AuthService {
         credentials
       );
       return response.data;
-    } catch {
-      throw new Error('Login failed');
+    } catch (error: unknown) {
+      throw error;
     }
   }
 
@@ -24,8 +24,8 @@ class AuthService {
         data
       );
       return response.data;
-    } catch {
-      throw new Error('Registration failed');
+    } catch (error: unknown) {
+      throw error;
     }
   }
 
@@ -35,8 +35,8 @@ class AuthService {
         '/me/'
       );
       return response.data;
-    } catch {
-      throw new Error('Failed to get current user');
+    } catch (error: unknown) {
+      throw error;
     }
   }
 }

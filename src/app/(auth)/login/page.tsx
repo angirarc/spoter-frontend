@@ -34,7 +34,7 @@ const Login = () => {
         login(data, router);
     };
 
-    const keys = Object.keys(errors) as (keyof typeof errors)[]; // TODO: fix this casting hell
+    const keys = Object.keys(errors) as (keyof typeof errors)[];
 
     return (
         <form onSubmit={handleSubmit(handleLogin)} className="flex flex-col gap-6">
@@ -45,12 +45,6 @@ const Login = () => {
                 </p>
             </div>
             <div className="grid gap-6">
-                {state.login.status === 'ERROR' &&
-                    <AlertNotif
-                        type="destructive"
-                        title="Error Logging In"
-                        message={state.login.message ?? ''} />
-                }
                 {state.login.status === 'SUCCESS' &&
                     <AlertNotif
                         type="default"
@@ -73,15 +67,11 @@ const Login = () => {
                     disabled={state.login.status === 'LOADING'}>
                     Login
                 </Button>
-                {
-                    keys.length > 0 &&
-                    <ul className="text-sm px-4 py-3 bg-red-300 rounded-md list-disc list-inside">
-                        {
-                            keys.map((key) => (
-                                <li key={key} className="text-black">{errors[key]?.message}</li>
-                            ))
-                        }
-                    </ul>
+                {(state.login.status === 'ERROR' || keys.length > 0) &&
+                    <AlertNotif
+                        type="destructive"
+                        title={ keys.length > 0 ? 'Input Error' : 'Error Logging In' }
+                        message={ keys.length > 0 ?  `${keys.map(ky => errors[ky]?.message).join(', ')}` : state.login.message ?? '' } />
                 }
             </div>
             <div className="text-center text-sm">

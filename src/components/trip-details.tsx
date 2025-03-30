@@ -20,6 +20,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import AlertNotif from "@/components/alert-notif";
 import useToggle from "@/hooks/use-toggle";
 import ConfirmDialog from "./confirm-dialog";
+import { ClipLoader } from "react-spinners";
 
 interface TripDetailsProps {
   trip: TripModel;
@@ -32,7 +33,7 @@ const schema = yup.object().shape({
 });
 
 const TripDetails = ({ trip }: TripDetailsProps) => {
-  const { reverseGeocoding, endTrip, updateTrip, userLocation, createTripLog, state } = useTripStore();
+  const { reverseGeocoding, endTrip, userLocation, createTripLog, state } = useTripStore();
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isLogDialogOpen, setIsLogDialogOpen] = useState(false);
   const [currentLocation, setCurrentLocation] = useState('');
@@ -58,6 +59,8 @@ const TripDetails = ({ trip }: TripDetailsProps) => {
   }, [isLogDialogOpen, reverseGeocoding]);
 
   const current = userLocation?.properties.full_address ?? currentLocation;
+
+  const logIsLoading = state.createTripLog.status === 'LOADING';
 
   const handleCreateLog = async () => {
     const vals = getValues();
@@ -170,7 +173,9 @@ const TripDetails = ({ trip }: TripDetailsProps) => {
           <DialogHeader>
             <DialogTitle>Edit Trip</DialogTitle>
           </DialogHeader>
-          <TripForm submit={updateTrip} />
+          <TripForm 
+            trip={trip}
+            callback={() => setIsEditDialogOpen(false)} />
         </DialogContent>
       </Dialog>
 
@@ -230,9 +235,13 @@ const TripDetails = ({ trip }: TripDetailsProps) => {
               />
             </div>
             <Button
-              disabled={isValid}
               onClick={handleCreateLog}
-              className="w-full">
+              disabled={logIsLoading || !isValid}
+              className="w-full flex">
+              {
+                  logIsLoading &&
+                  <ClipLoader color='white' size="14" />
+              }
               Create New Log
             </Button>
           </div>

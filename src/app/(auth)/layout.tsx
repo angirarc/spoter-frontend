@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import Image from 'next/image';
 import { ArrowUpCircleIcon } from 'lucide-react';
 
 const AuthLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => (
@@ -21,7 +20,7 @@ const AuthLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => (
       </div>
     </div>
     <div className="relative hidden bg-muted lg:block">
-      <Image
+      <img
         src="/auth.jpg"
         alt="Image"
         className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"

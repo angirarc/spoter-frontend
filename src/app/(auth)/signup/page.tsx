@@ -48,16 +48,10 @@ const SignUp = () => {
                 </p>
             </div>
             <div className="grid gap-6">
-                {state.login.status === 'ERROR' &&
-                    <AlertNotif
-                        type="destructive"
-                        title="Error Signing Up"
-                        message={state.login.message ?? ''} />
-                }
-                {state.login.status === 'SUCCESS' &&
+                {state.signup.status === 'SUCCESS' &&
                     <AlertNotif
                         type="default"
-                        title="Login Successful"
+                        title="Sign Up Successful"
                         message="You will be redirected to the homepage" />
                 }
                 <div className="grid gap-2">
@@ -77,24 +71,20 @@ const SignUp = () => {
                 <Button
                     type="submit"
                     className="w-full"
-                    disabled={state.login.status === 'ERROR'}>
+                    disabled={state.signup.status === 'LOADING'}>
                     Create Account
                 </Button>
             </div>
-            {
-                keys.length > 0 &&
-                <ul className="text-sm px-4 py-3 bg-red-300 rounded-md list-disc list-inside">
-                    {
-                        keys.map((key) => (
-                            <li key={key} className="text-black">{errors[key]?.message}</li>
-                        ))
-                    }
-                </ul>
+            {(state.signup.status === 'ERROR' || keys.length > 0) &&
+                <AlertNotif
+                    type="destructive"
+                    title={ keys.length > 0 ? 'Input Error' : 'Error Signing Up' }
+                    message={ keys.length > 0 ?  `${keys.map(ky => errors[ky]?.message).join(' | ')}` : state.signup.message ?? '' } />
             }
             <div className="text-center text-sm">
-                Don&apos;t have an account?{" "}
-                <Link href="/signup" className="underline underline-offset-4">
-                    Sign up
+                Already have an account?{" "}
+                <Link href="/login" className="underline underline-offset-4">
+                    Log In
                 </Link>
             </div>
         </form>

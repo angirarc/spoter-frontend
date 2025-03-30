@@ -27,7 +27,7 @@ const Home = () => {
                             <AccordionContent>
                                 {
                                     selectedTrip ? <TripDetails trip={selectedTrip} />
-                                    : <TripForm submit={createTrip} />
+                                    : <TripForm />
                                 }
                             </AccordionContent>
                         </AccordionItem>
