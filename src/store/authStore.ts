@@ -94,7 +94,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
     logout: (router) => {
         clearAuth();
-        set({ isAuthenticated: false, user: null });
+        set({ isAuthenticated: false, user: null, state: initialStatus });
         router.push('/login');
     },
 }));
