@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { useAuthStore } from "@/store/authStore";
 import { LoginCredentials } from "@/lib/types/payloads";
 import AlertNotif from "@/components/alert-notif";
+import { ClipLoader } from "react-spinners";
 
 const schema = yup.object().shape({
     email: yup.string().email().required(),
@@ -33,6 +34,8 @@ const Login = () => {
     const handleLogin = (data: LoginCredentials) => {
         login(data, router);
     };
+
+    const isLoading = state.login.status === 'LOADING';
 
     const keys = Object.keys(errors) as (keyof typeof errors)[];
 
@@ -64,7 +67,11 @@ const Login = () => {
                 <Button
                     type="submit"
                     className="w-full"
-                    disabled={state.login.status === 'LOADING'}>
+                    disabled={isLoading}>
+                    {
+                        isLoading &&
+                        <ClipLoader color='white' size="14" />
+                    }
                     Login
                 </Button>
                 {(state.login.status === 'ERROR' || keys.length > 0) &&

@@ -13,6 +13,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { useAuthStore } from "@/store/authStore";
 import AlertNotif from "@/components/alert-notif";
+import { ClipLoader } from "react-spinners";
 
 const schema = yup.object().shape({
     name: yup.string().required(),
@@ -38,6 +39,8 @@ const SignUp = () => {
     };
 
     const keys = Object.keys(errors) as (keyof typeof errors)[];
+
+    const isLoading = state.signup.status === 'LOADING';
     
     return (
         <form onSubmit={handleSubmit(handleSignup)} className="flex flex-col gap-6">
@@ -71,7 +74,11 @@ const SignUp = () => {
                 <Button
                     type="submit"
                     className="w-full"
-                    disabled={state.signup.status === 'LOADING'}>
+                    disabled={isLoading}>
+                    {
+                        isLoading &&
+                        <ClipLoader color='white' size="14" />
+                    }
                     Create Account
                 </Button>
             </div>
