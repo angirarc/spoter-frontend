@@ -59,6 +59,12 @@ const TripDetails = ({ trip }: TripDetailsProps) => {
     }
   }, [isLogDialogOpen, reverseGeocoding]);
 
+  useEffect(() => {
+    if (userLocation) {
+      setCurrentLocation(`${userLocation.geometry.coordinates[1]}, ${userLocation.geometry.coordinates[0]}`);
+    }
+  }, [userLocation])
+
   const current = userLocation?.properties.full_address ?? currentLocation;
 
   const logIsLoading = state.createTripLog.status === 'LOADING';
