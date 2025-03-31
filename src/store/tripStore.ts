@@ -19,6 +19,7 @@ interface TripState {
     selectedLog?: LogModel;
     searchResults: MapBoxFeature[];
     userLocation?: MapBoxFeature;
+    setUserLocation: (feat?: MapBoxFeature) => void; // TODO: add this to the state and remove i
 
     searchLocations: (str: string) => Promise<void>;
     reverseGeocoding: (lang: number, long: number, callback?: (feat: MapBoxFeature) => void) => Promise<void>;
@@ -50,6 +51,7 @@ export const useTripStore = create<TripState>((set, get) => ({
     selectedLog: undefined,
     searchResults: [],
     userLocation: undefined,
+    setUserLocation: (feat) => set({ userLocation: feat }),
 
     searchLocations: async (str) => {
         const { state } = get();

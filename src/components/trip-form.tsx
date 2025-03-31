@@ -35,7 +35,7 @@ const getCoordinates = (location: string) => {
     };
 }
 
-const LocationSelect = ({ value, setValue }: { value?: MapBoxFeature, setValue: (value?: MapBoxFeature) => void }) => {
+export const LocationSelect = ({ value, setValue }: { value?: MapBoxFeature, setValue: (value?: MapBoxFeature) => void }) => {
     const { searchResults, searchLocations, state } = useTripStore();
 
     const debouncedSearch = useCallback(

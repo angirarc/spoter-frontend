@@ -14,7 +14,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 
 import { TripModel } from '@/lib/types/models';
 import { useTripStore } from '@/store/tripStore';
-import TripForm from '@/components/trip-form';
+import TripForm, { LocationSelect } from '@/components/trip-form';
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import AlertNotif from "@/components/alert-notif";
@@ -33,7 +33,7 @@ const schema = yup.object().shape({
 });
 
 const TripDetails = ({ trip }: TripDetailsProps) => {
-  const { reverseGeocoding, endTrip, userLocation, createTripLog, state } = useTripStore();
+  const { reverseGeocoding, endTrip, userLocation, setUserLocation, createTripLog, state } = useTripStore();
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isLogDialogOpen, setIsLogDialogOpen] = useState(false);
   const [currentLocation, setCurrentLocation] = useState('');
@@ -41,13 +41,13 @@ const TripDetails = ({ trip }: TripDetailsProps) => {
 
   const [endModal, toggleEndModal] = useToggle();
 
-  const { 
-      reset,
-      register, 
-      getValues,
-      formState: { isValid } 
+  const {
+    reset,
+    register,
+    getValues,
+    formState: { isValid }
   } = useForm({
-      resolver: yupResolver(schema)
+    resolver: yupResolver(schema)
   });
 
   useEffect(() => {
@@ -153,7 +153,7 @@ const TripDetails = ({ trip }: TripDetailsProps) => {
               <div className="flex-1 text-gray-500">{instruction}</div>
             </div>
           ))
-        : <div className="text-gray-500 text-sm">No route instructions available</div>
+          : <div className="text-gray-500 text-sm">No route instructions available</div>
       }
 
       <div className="flex justify-between mt-4">
@@ -185,7 +185,7 @@ const TripDetails = ({ trip }: TripDetailsProps) => {
           <DialogHeader>
             <DialogTitle>Edit Trip</DialogTitle>
           </DialogHeader>
-          <TripForm 
+          <TripForm
             trip={trip}
             callback={() => setIsEditDialogOpen(false)} />
         </DialogContent>
@@ -198,13 +198,13 @@ const TripDetails = ({ trip }: TripDetailsProps) => {
             <DialogTitle>Add Trip Log</DialogTitle>
           </DialogHeader>
           <div className="grid gap-4 py-4">
-            { state.createTripLog.status === 'ERROR' &&
+            {state.createTripLog.status === 'ERROR' &&
               <AlertNotif
                 type="destructive"
                 title="An Error Occurred"
-                message={ state.createTripLog.message ? state.createTripLog.message : geolocationError ? geolocationError?.message : '' } />
+                message={state.createTripLog.message ? state.createTripLog.message : geolocationError ? geolocationError?.message : ''} />
             }
-            { state.createTripLog.status === 'SUCCESS' &&
+            {state.createTripLog.status === 'SUCCESS' &&
               <AlertNotif
                 type="default"
                 title="Success!"
@@ -212,16 +212,23 @@ const TripDetails = ({ trip }: TripDetailsProps) => {
             }
             <div className="grid gap-2">
               <Label htmlFor="location">Current Location</Label>
-              <Input
-                id="location"
-                type="text"
-                disabled
-                value={current}
-                placeholder={ state.reverseGeocoding.status === 'LOADING' ? "Getting your location..." :  state.reverseGeocoding.status === 'ERROR' ? "Failed to get your location" : "Current Location" }
-              />
+              {
+                geolocationError ?
+                  <LocationSelect
+                    value={userLocation}
+                    setValue={setUserLocation} />
+                  :
+                  <Input
+                    id="location"
+                    type="text"
+                    disabled
+                    value={current}
+                    placeholder={state.reverseGeocoding.status === 'LOADING' ? "Getting your location..." : state.reverseGeocoding.status === 'ERROR' ? "Failed to get your location" : "Current Location"}
+                  />
+              }
               <div className="flex px-1">
                 <AlertCircle className="h-4 w-4" />
-                <p className="text-gray-500 ml-1 italic text-xs">This will be fetched automatically and may take a while when not using GPS</p>
+                <p className="text-gray-500 ml-1 italic text-xs">{ geolocationError ? 'Please input your location manually' : 'This will be fetched automatically. If it fails, please input your location manually' }</p>
               </div>
             </div>
             <div className="grid gap-2">
@@ -255,8 +262,8 @@ const TripDetails = ({ trip }: TripDetailsProps) => {
               disabled={logIsLoading || !isValid}
               className="w-full flex">
               {
-                  logIsLoading &&
-                  <ClipLoader color='white' size="14" />
+                logIsLoading &&
+                <ClipLoader color='white' size="14" />
               }
               Create New Log
             </Button>
