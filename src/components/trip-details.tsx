@@ -3,7 +3,7 @@
 import * as yup from "yup";
 import { format } from 'date-fns';
 import { useEffect, useState } from 'react';
-import { Edit2Icon, PlusCircleIcon, ClockIcon, MapPinIcon, TruckIcon } from 'lucide-react';
+import { Edit2Icon, PlusCircleIcon, ClockIcon, MapPinIcon, TruckIcon, AlertCircle } from 'lucide-react';
 
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -37,6 +37,7 @@ const TripDetails = ({ trip }: TripDetailsProps) => {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isLogDialogOpen, setIsLogDialogOpen] = useState(false);
   const [currentLocation, setCurrentLocation] = useState('');
+  const [geolocationError, setGeolocationError] = useState<GeolocationPositionError | null>(null);
 
   const [endModal, toggleEndModal] = useToggle();
 
@@ -54,7 +55,7 @@ const TripDetails = ({ trip }: TripDetailsProps) => {
       navigator.geolocation.getCurrentPosition((pos) => {
         reverseGeocoding(pos.coords.latitude, pos.coords.longitude);
         setCurrentLocation(`${pos.coords.latitude}, ${pos.coords.longitude}`);
-      });
+      }, setGeolocationError);
     }
   }, [isLogDialogOpen, reverseGeocoding]);
 
@@ -190,7 +191,7 @@ const TripDetails = ({ trip }: TripDetailsProps) => {
               <AlertNotif
                 type="destructive"
                 title="An Error Occurred"
-                message={ state.createTripLog.message ?? '' } />
+                message={ state.createTripLog.message ? state.createTripLog.message : geolocationError ? geolocationError?.message : '' } />
             }
             { state.createTripLog.status === 'SUCCESS' &&
               <AlertNotif
@@ -207,6 +208,10 @@ const TripDetails = ({ trip }: TripDetailsProps) => {
                 value={current}
                 placeholder={ state.reverseGeocoding.status === 'LOADING' ? "Getting your location..." :  state.reverseGeocoding.status === 'ERROR' ? "Failed to get your location" : "Current Location" }
               />
+              <div className="flex px-1">
+                <AlertCircle className="h-4 w-4" />
+                <p className="text-gray-500 ml-1 italic text-xs">This will be fetched automatically and may take a while when not using GPS</p>
+              </div>
             </div>
             <div className="grid gap-2">
               <Label htmlFor="memo">Memo</Label>

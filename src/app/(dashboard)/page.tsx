@@ -11,16 +11,16 @@ import {
 } from "@/components/ui/accordion"
 
 import TripLogs from "@/components/trip-logs";
-import TripDetails from "@/components/trip-details";
 import TripForm from "@/components/trip-form";
+import TripDetails from "@/components/trip-details";
 
 const Home = () => {
-    const { selectedTrip, createTrip } = useTripStore();
+    const { selectedTrip } = useTripStore();
     return (
         <div className="relative">
             <Map />
             <div className="fixed flex flex-col items-end top-16 right-6">
-                <div className="bg-white w-[500px] px-6 py-2 rounded-md mb-2">
+                <div className="bg-white xs:w-[300px] sm:w-[400px] md:w-[500px] lg:w-[500px] w-[500px] px-6 py-2 rounded-md mb-2">
                     <Accordion type="single" collapsible>
                         <AccordionItem value="item-1">
                             <AccordionTrigger className="cursor-pointer">{selectedTrip ? 'Trip Details' : 'Create New Trip'}</AccordionTrigger>
@@ -36,7 +36,7 @@ const Home = () => {
                 {
                     selectedTrip && (
                         <>
-                            <div className="bg-white w-[600px] px-6 py-2 rounded-md mt-2">
+                            <div className="bg-white xs:w-[300px] sm:w-[400px] md:w-[500px] lg:w-[600px] w-[600px] px-6 py-2 rounded-md mt-2">
                                 <Accordion type="single" collapsible>
                                     <AccordionItem value="item-1">
                                         <AccordionTrigger className="cursor-pointer">Trip Logs</AccordionTrigger>

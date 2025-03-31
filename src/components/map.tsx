@@ -1,9 +1,9 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import ReactMapboxGl, { Layer, Feature } from 'react-mapbox-gl';
 
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { useEffect, useState } from 'react';
 
 const MapComponent = ReactMapboxGl({
     accessToken: process.env.NEXT_PUBLIC_MAPBOX_API_KEY || '',
@@ -19,7 +19,6 @@ const Map = () => {
             });
         }
     }, []);
-    console.log({currentLocation})
 
     return (
         <MapComponent
@@ -29,9 +28,13 @@ const Map = () => {
                 width: '100vw'
             }}
         >
-            <Layer type="symbol" id="marker" layout={{ 'icon-image': 'marker-15' }}>
-                <Feature coordinates={currentLocation ? currentLocation : [-0.481747846041145, 51.3233379650232]} />
-            </Layer>
+            {
+                currentLocation && (
+                    <Layer type="symbol" id="marker" layout={{ 'icon-image': 'marker-15' }}>
+                        <Feature coordinates={currentLocation} />
+                    </Layer>
+                )
+            }
         </MapComponent>
     );
 }
