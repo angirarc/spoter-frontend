@@ -28,7 +28,7 @@ import { ClipLoader } from 'react-spinners';
 // import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const getCoordinates = (location: string) => {
-    const coords = location.split(',');
+    const coords = location.split(', ');
     return {
         latitude: parseFloat(coords[0]),
         longitude: parseFloat(coords[1])

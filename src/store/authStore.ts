@@ -31,7 +31,7 @@ const initialStatus = {
 export const useAuthStore = create<AuthState>((set, get) => ({
     state: initialStatus,
     isAuthenticated: false,
-    user: getLocalStorageItem(KEYS.user) ? JSON.parse(getLocalStorageItem(KEYS.user)!) : null,
+    user: JSON.parse(getLocalStorageItem(KEYS.user) ?? '{}'),
     token: getLocalStorageItem(KEYS.accessToken),
 
     login: async (payload, router) => {
@@ -94,7 +94,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
     logout: (router) => {
         clearAuth();
-        set({ isAuthenticated: false, user: null, state: initialStatus });
+        set({ isAuthenticated: false, user: null });
         router.push('/login');
     },
 }));
