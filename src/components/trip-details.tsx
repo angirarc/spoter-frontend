@@ -144,6 +144,17 @@ const TripDetails = ({ trip }: TripDetailsProps) => {
           </div>
         )}
       </div>
+      <h4 className="text-sm font-semibold mb-2">Route Instructions</h4>
+      {
+        trip.route_instructions.length > 0 ?
+          trip.route_instructions.map((instruction, i) => (
+            <div key={i} className="flex items-center mb-2">
+              <div className="w-2 h-2 rounded-full bg-gray-500 mr-2"></div>
+              <div className="flex-1 text-gray-500">{instruction}</div>
+            </div>
+          ))
+        : <div className="text-gray-500 text-sm">No route instructions available</div>
+      }
 
       <div className="flex justify-between mt-4">
         {!trip.end_time && (
