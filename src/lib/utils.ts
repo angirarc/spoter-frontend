@@ -1,3 +1,5 @@
+// Type definitions for environment variables and other types
+
 import { twMerge } from "tailwind-merge"
 import { clsx, type ClassValue } from "clsx"
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
@@ -5,7 +7,7 @@ import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { LoadingStatus, newStatus } from "./types/state";
 import { clearAuth, getAccessToken } from "./sharePreference";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:8000';
+const API_BASE_URL: string = (import.meta as any).env?.VITE_API_BASE_URL || 'http://localhost:8000/api';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -16,7 +18,7 @@ class HttpClient {
 
   constructor() {
     this.instance = axios.create({
-      baseURL: `${API_BASE_URL}/api`,
+      baseURL: API_BASE_URL,
       timeout: 30000,
       headers: {
         'Content-Type': 'application/json',
@@ -46,7 +48,7 @@ class HttpClient {
       (response) => response,
       (error) => {
         const { response } = error;
-        
+
         // Handle authentication errors
         if (response && response.status === 401) {
           // Clear token and redirect to login if needed
@@ -54,12 +56,12 @@ class HttpClient {
           // For now, we'll just log this as we're assuming the user is authenticated
           console.error('Authentication error: Token expired or invalid');
         }
-        
+
         // Handle server errors
         if (response && response.status >= 500) {
           console.error('Server error:', response.data);
         }
-        
+
         return Promise.reject(error);
       }
     );
@@ -88,19 +90,15 @@ class HttpClient {
 
 export const httpClient = new HttpClient();
 
-const getErrorMessage = (e: unknown): string => {
-  if (axios.isAxiosError(e)) {
-    if (e.response) {
-     return e.response.data.error;
-    } else if (e.request) {
-      return 'No response received';
-    } else {
-      return 'Unknown error occurred';
-    }
+const getErrorMessage = (error: unknown) => {
+  if (axios.isAxiosError(error)) {
+    return error.response?.data.message ?? error.request ? 'No Response Received' : 'Unknown error occurred';
+  } else if (error instanceof Error) {
+    return error.message;
   } else {
     return 'Unknown error occurred';
   }
-}
+};
 
 export const handleError = (e: unknown, set: any, status: LoadingStatus, fn: string) => {
   const message = getErrorMessage(e);
